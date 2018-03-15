@@ -16,9 +16,10 @@ N1D = 9             # Number of rocket engines
 Ftotal = F1D * N1D  # Total thrust (Newtons)
 tburn = 180         # Burn time (seconds)
 
-# Predict the final velocity based on simple Newtons' 2nd Law
-vmax = Ftotal*tburn/(me+mp)
-print("Predicted final velocity (Newton's 2nd Law), vmax: ", vmax, " m/s")
+# Predict the final velocity using Tsiolkovsky's Rocket Equation
+vmaxre = Ftotal*tburn/mp*log((me+mp)/me)
+print("Predicted final velocity (Rocket Equation), vmax: ", vmaxre, " m/s")
+
 
 # Create a function for determining the rocket thrust
 def GetThrust():
@@ -46,6 +47,20 @@ def StartRocket():
         RocketStarted = True
         # Note the starting time
         StartTime = rocket.shiptime
+
+# Function for calculating the total rocket mass, based on burn time and total
+# propellent mass.
+def GetMass():
+    global RocketStarted
+    if RocketStarted:
+        # calculate empty mass plus a fraction of the propellent mass based on time
+        return me + mp*(tburn-BurnTime)/tburn
+    else:
+        # not started: just return the full pre-launch rocket mass
+        return me + mp
+
+#Create and "run" the rocket
+rocket = Rocket(earth, thrust=GetThrust, mass=GetMass)
         
 # Create a button for starting the simulation
 # Physical positioning at 10,400 pixels, calls the StartRocket function
